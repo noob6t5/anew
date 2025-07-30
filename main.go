@@ -51,6 +51,20 @@ func main() {
 		}
 	}
 
+	// ==== ADDED BLOCK: check if stdin is a terminal and bail if yes ====
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to stat stdin: %v\n", err)
+		os.Exit(1)
+	}
+
+	if (fi.Mode() & os.ModeCharDevice) != 0 {
+		fmt.Fprintln(os.Stderr, "anew: expects input via pipe or redirection. Example:")
+		fmt.Fprintln(os.Stderr, "  cat newthings.txt | anew things.txt")
+		os.Exit(1)
+	}
+	// ==== END ADDED BLOCK ====
+
 	// read the lines, append and output them if they're new
 	sc := bufio.NewScanner(os.Stdin)
 
@@ -76,3 +90,4 @@ func main() {
 		}
 	}
 }
+
